@@ -1,25 +1,26 @@
 const express = require('express');
 const MongoClient = require('mongodb').MongoClient;
+const cors = require('cors');
 
 const app = express();
-const port = 4589;
-const url = "mongodb://localhost:27017/";
+const port = 4599;
+const url = "mongodb://localhost:27017/mydb";
 
-let allowCrossDomain = ( req, res, next ) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-//    intercept OPTIONS method
-    if ( 'OPTIONS' === req.method ) {
-        res.sendStatus(200);
-    }
-    else {
-        next();
-    }
-};
+// let allowCrossDomain = ( req, res, next ) => {
+//     res.header('Access-Control-Allow-Origin', '*');
+//     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+//     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+// //    intercept OPTIONS method
+//     if ( 'OPTIONS' === req.method ) {
+//         res.sendStatus(200);
+//     }
+//     else {
+//         next();
+//     }
+// };
 
-app.use(allowCrossDomain);
-
+// app.use(allowCrossDomain);
+app.use(cors());
 
 app.get('/brands', ( req, res ) => {
 
@@ -53,6 +54,8 @@ app.get('/mobilesList', ( req, res ) => {
     let filterStatus = req.query.isBrandFilter;
     let sortFilterStatus = req.query.isSortFilter;
     let filterValue = req.query.brandFilterValue;
+    let searchStatus = req.query.searchFor;
+    let searchValue = req.query.searchValue;
     let sortFilterValue = parseInt(req.query.sortValue);
     console.log(sortFilterValue,'sfv')
 
@@ -66,15 +69,19 @@ app.get('/mobilesList', ( req, res ) => {
         query = {brand: {$in: filterValue}};
         sortVal = {};
     }
-
     else if ( filterStatus === 'false' && sortFilterStatus === 'true' ){
         console.log('f-na s-a');
         query = {};
          sortVal = {price: sortFilterValue };
     }
+    else if( searchStatus === 'true') {
+        query = {brand: {$in: searchValue}}
+    }
+
+
 
     else {
-        console.log('f-na s-na');
+        console.log('else');
         query = {};
         sortVal = {};
     }
