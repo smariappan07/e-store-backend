@@ -4,8 +4,8 @@ const cors = require('cors');
 
 const app = express();
 const port = 4599;
-const url = "mongodb://localhost:27017/mydb";
-
+const url = "mongodb://localhost:27017/eStore";
+//
 // let allowCrossDomain = ( req, res, next ) => {
 //     res.header('Access-Control-Allow-Origin', '*');
 //     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -21,6 +21,7 @@ const url = "mongodb://localhost:27017/mydb";
 
 // app.use(allowCrossDomain);
 app.use(cors());
+app.use(express.json());
 
 app.get('/brands', ( req, res ) => {
 
@@ -64,7 +65,7 @@ app.get('/mobilesList', ( req, res ) => {
          query = {brand: {$in: filterValue}};
         sortVal = {price: sortFilterValue };
     }
-    else if(filterStatus === 'true' && sortFilterStatus === 'false' ){
+    else if(filterStatus === 'true' && sortFilterStatus === 'false'  ){
         console.log('f-a s-na')
         query = {brand: {$in: filterValue}};
         sortVal = {};
@@ -74,12 +75,10 @@ app.get('/mobilesList', ( req, res ) => {
         query = {};
          sortVal = {price: sortFilterValue };
     }
-    else if( searchStatus === 'true') {
-        query = {brand: {$in: searchValue}}
+    else if( searchStatus === 'true' ) {
+
+        query = {title: {$regex: new RegExp(".*"+  searchValue +".*", "i") }}
     }
-
-
-
     else {
         console.log('else');
         query = {};
@@ -91,7 +90,7 @@ app.get('/mobilesList', ( req, res ) => {
        if (err) throw err;
          let dbObject = dbse.db("eStore");
 
-        dbObject.collection("mobilesList").find(query).sort(sortVal).toArray( (err, result) => {
+        dbObject.collection("mobilesInfo").find(query).sort(sortVal).toArray( (err, result) => {
             if (err){
                  console.log(err);
                 responseObject.status = "Failure";
@@ -106,6 +105,36 @@ app.get('/mobilesList', ( req, res ) => {
         });
      });
 });
+
+app.post('/addItems', ( req, res ) => {
+    console.log(req.body);
+    let responseObject = {};
+    let getData = req.body;
+
+    let items = getData;
+    MongoClient.connect(url, (err, dbse ) => {
+
+        if (err) throw err;
+        let dbObject = dbse.db("eStore");
+
+        dbObject.collection('mobilesInfo').insertOne(items, ( err, result ) => {
+            if (err){
+                console.log(err);
+                responseObject.status = "Failure";
+                res.json(responseObject);
+            }
+            else {
+                responseObject.status = "Success";
+                // responseObject["data"] = result;
+                console.log(responseObject);
+                res.json(responseObject);
+            }
+            dbse.close();
+        });
+    });
+
+});
+
 
 app.listen(port, () => {
   console.log(`App Listening to Port ${port}`);
