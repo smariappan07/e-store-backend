@@ -1,5 +1,6 @@
 const express = require('express');
 const MongoClient = require('mongodb').MongoClient;
+const ObjectId = require('mongodb').ObjectId;
 const cors = require('cors');
 
 const app = express();
@@ -57,8 +58,11 @@ app.get('/mobilesList', ( req, res ) => {
     let filterValue = req.query.brandFilterValue;
     let searchStatus = req.query.searchFor;
     let searchValue = req.query.searchValue;
+    let mobileId = req.query.mobileId;
+    let mobId = new ObjectId(mobileId);
     let sortFilterValue = parseInt(req.query.sortValue);
     console.log(sortFilterValue,'sfv')
+    console.log(mobileId,'id')
 
     if(filterStatus === 'true' && sortFilterStatus === 'true' ){
         console.log('both filter applied')
@@ -76,8 +80,11 @@ app.get('/mobilesList', ( req, res ) => {
          sortVal = {price: sortFilterValue };
     }
     else if( searchStatus === 'true' ) {
-
         query = {title: {$regex: new RegExp(".*"+  searchValue +".*", "i") }}
+    }
+    else if(mobileId){
+        console.log('else-if');
+        query = {_id: mobId};
     }
     else {
         console.log('else');
