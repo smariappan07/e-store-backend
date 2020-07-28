@@ -366,7 +366,7 @@ MongoClient.connect(url, (err, dbse) => {
        "title" : "Huawei Mate 20 Lite Dual Sim 64 GB (İthalatçı Garantili)",
        "weight" : "132 grams (4.7 ounces) with battery"
    } ];
-    dbObject.collection("mobilesInfo").insertMany( data ,( err, res ) => {
+    dbObject.collection("mobilesInfm").insertMany( data ,( err, res ) => {
         if ( err ) throw err;
         console.log(`Data inserted ${res.insertedCount}`);
         dbse.close();

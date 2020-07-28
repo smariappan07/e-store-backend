@@ -97,7 +97,7 @@ app.get('/mobilesList', ( req, res ) => {
        if (err) throw err;
          let dbObject = dbse.db("eStore");
 
-        dbObject.collection("mobilesInfo").find(query).sort(sortVal).toArray( (err, result) => {
+        dbObject.collection("mobilesInfm").find(query).sort(sortVal).toArray( (err, result) => {
             if (err){
                  console.log(err);
                 responseObject.status = "Failure";
@@ -115,8 +115,20 @@ app.get('/mobilesList', ( req, res ) => {
 
 app.post('/addItems', ( req, res ) => {
     console.log(req.body);
+
     let responseObject = {};
-    let getData = req.body;
+
+    let tit = req.body.title;
+    let title = tit.toLowerCase();
+    let br = req.body.brand;
+    let brand = br.toLowerCase();
+    console.log(title);
+    console.log(brand)
+    let getData = {
+        brand: brand,
+        title: title,
+        price: Number(req.body.price)
+    }
 
     let items = getData;
     MongoClient.connect(url, (err, dbse ) => {
@@ -124,7 +136,7 @@ app.post('/addItems', ( req, res ) => {
         if (err) throw err;
         let dbObject = dbse.db("eStore");
 
-        dbObject.collection('mobilesInfo').insertOne(items, ( err, result ) => {
+        dbObject.collection('mobilesInfm').insertOne(items, ( err, result ) => {
             if (err){
                 console.log(err);
                 responseObject.status = "Failure";
